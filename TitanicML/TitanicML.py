@@ -39,7 +39,10 @@ print()
 column = "Name"
 print("Col: "+column)
 print_blank_count(all_df, column)
-print("-> OK, using unchanged")
+print("-> All strings so drop column")
+train_df.drop(columns=[column], inplace=True)
+test_df.drop(columns=[column], inplace=True)
+all_df.drop(columns=[column], inplace=True)
 print()
 
 #Sex
@@ -165,6 +168,7 @@ print("-> Too many blanks an unique values, drop column")
 train_df.drop(columns=[column],  inplace=True)
 test_df.drop(columns=[column],  inplace=True)
 all_df.drop(columns=[column],  inplace=True)
+print()
 
 #Embarked
 column="Embarked"
@@ -172,20 +176,43 @@ print("Col: "+column)
 print_blank_count(all_df, column)
 print(all_df[column].value_counts())
 print("-> Only two blanks, so replace with mode value")
+print("-> Then convert to numeric code")
+# fill in blanks
 mode = all_df[column].mode().iloc[0] # need iloc[0] since mode() returns a data frame with a single value
 print("Mode: " + mode)
 train_df[column].fillna(mode, inplace=True)
 test_df[column].fillna(mode, inplace=True)
 all_df[column].fillna(mode, inplace=True)
 print_blank_count(all_df, column)
+# convert to numbers
+train_df[column].replace(to_replace="S",value=0, inplace=True)
+test_df[column].replace(to_replace="S",value=0, inplace=True)
+all_df[column].replace(to_replace="S",value=0, inplace=True)
+train_df[column].replace(to_replace="C",value=1, inplace=True)
+test_df[column].replace(to_replace="C",value=1, inplace=True)
+all_df[column].replace(to_replace="C",value=1, inplace=True)
+train_df[column].replace(to_replace="Q",value=2, inplace=True)
+test_df[column].replace(to_replace="Q",value=2, inplace=True)
+all_df[column].replace(to_replace="Q",value=2, inplace=True)
 print(all_df[column].value_counts())
 print()
 
 print("Data cleaning complete")
 all_df.info()
+print(all_df.iloc[0])
 print()
 
 print("Start machine learning")
+
+X = (train_df.drop(columns=["PassengerId","Survived"])).to_numpy().T
+Y = (train_df["Survived"]).to_numpy(dtype="float").reshape(1, len(train_df["Survived"]))
+W = np.zeros((len(train_df.columns)-2,1))
+
+print("X = ", X.dtype)
+print("Y = ", Y.dtype)
+print("W = ", W.dtype)
+
+Y_est = np.dot(W.T, X)
 
 print()
 print("DONE")

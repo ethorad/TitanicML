@@ -127,9 +127,9 @@ print("Col: "+column)
 print_blank_count(all_df, column)
 print("Unique count: "+str(all_df[column].nunique()) + " (" + str(round(all_df[column].nunique() / len(all_df)* 100,1)) + "%)")
 print("-> Too many unique values, drop this column")
-train_df.drop(columns=[column])
-test_df.drop(columns=[column])
-all_df.drop(columns=[column])
+train_df.drop(columns=[column], inplace=True)
+test_df.drop(columns=[column], inplace=True)
+all_df.drop(columns=[column], inplace=True)
 print()
 
 #Fare
@@ -139,7 +139,13 @@ print_blank_count(all_df, column)
 print("Median: " + str(round(all_df[column].median(),1)))
 print("Mean: " + str(round(all_df[column].mean(),1)))
 print("Std Dev: "+str(round(all_df[column].std(),1)))
-print("-> OK, normalise")
+print("-> OK, set blanks to median then normalise")
+# replace blanks with median on all data
+med = all_df[column].median()
+train_df[column].fillna(med, inplace=True)
+test_df[column].fillna(med, inplace=True)
+all_df[column].fillna(med, inplace=True)
+# normalise
 mean = all_df[column].mean()
 stddev = all_df[column].std()
 train_df[column] = (train_df[column]-mean)/stddev
@@ -156,9 +162,9 @@ print("Col: "+column)
 print_blank_count(all_df, column)
 print("Unique count: "+str(all_df[column].nunique()) + " (" + str(round(all_df[column].nunique() / len(all_df)* 100,1)) + "%)")
 print("-> Too many blanks an unique values, drop column")
-train_df.drop(columns=[column])
-test_df.drop(columns=[column])
-all_df.drop(columns=[column])
+train_df.drop(columns=[column],  inplace=True)
+test_df.drop(columns=[column],  inplace=True)
+all_df.drop(columns=[column],  inplace=True)
 
 #Embarked
 column="Embarked"
@@ -173,6 +179,13 @@ test_df[column].fillna(mode, inplace=True)
 all_df[column].fillna(mode, inplace=True)
 print_blank_count(all_df, column)
 print(all_df[column].value_counts())
+print()
+
+print("Data cleaning complete")
+all_df.info()
+print()
+
+print("Start machine learning")
 
 print()
 print("DONE")
